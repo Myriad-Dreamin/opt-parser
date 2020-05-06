@@ -4,11 +4,11 @@
 
 #include <utility>
 
-using applyF = std::function<void(dep::OptParser &)>;
+using applyF = std::function<void(minimum::OptParser &)>;
 
 template<typename T>
 auto applyOpt(T &&opt) {
-    return [&](dep::OptParser &parser) {
+    return [&](minimum::OptParser &parser) {
         parser.addOpts(std::forward<T>(opt));
     };
 }
@@ -19,21 +19,21 @@ struct OptParseTestCase {
 
     std::vector<applyF> opts;
 
-    std::vector<std::tuple<dep::StringOpt *, std::string *, const char *>> str_cases;
+    std::vector<std::tuple<minimum::StringOpt *, std::string *, const char *>> str_cases;
 
     [[maybe_unused]] OptParseTestCase &str_case(const char *k, const char *v, const char *default_v = "") {
         auto storage = new std::string;
-        auto opt = new dep::StringOpt(k, storage, "", "", default_v);
+        auto opt = new minimum::StringOpt(k, storage, "", "", default_v);
         opts.emplace_back(applyOpt(*opt));
         str_cases.emplace_back(opt, storage, v);
         return *this;
     }
 
-    std::vector<std::tuple<dep::Int64Opt *, int64_t *, int64_t>> int64_cases;
+    std::vector<std::tuple<minimum::Int64Opt *, int64_t *, int64_t>> int64_cases;
 
     [[maybe_unused]] OptParseTestCase &int64_case(const char *k, int64_t v, int64_t default_v = 0) {
         auto storage = new int64_t;
-        auto opt = new dep::Int64Opt(k, storage, "", "", default_v);
+        auto opt = new minimum::Int64Opt(k, storage, "", "", default_v);
         opts.emplace_back(applyOpt(*opt));
         int64_cases.emplace_back(opt, storage, v);
         return *this;
@@ -52,7 +52,7 @@ class OptParseTest : public testing::TestWithParam<OptParseTestCase> {
 TEST_P(OptParseTest, WillNotThrowException) /* NOLINT */
 {
     auto &param = GetParam();
-    dep::OptParser parser;
+    minimum::OptParser parser;
 
     for (auto &f: param.opts) {
         f(parser);
@@ -100,7 +100,7 @@ class OptParseTestWillThrowException : public testing::TestWithParam<OptParseTes
 TEST_P(OptParseTestWillThrowException, WillThrowException) /* NOLINT */
 {
     auto &param = GetParam();
-    dep::OptParser parser;
+    minimum::OptParser parser;
 
     for (auto &f: param.opts) {
         f(parser);
@@ -109,7 +109,7 @@ TEST_P(OptParseTestWillThrowException, WillThrowException) /* NOLINT */
     int argc = GetParam().argc;
     const char **argv = GetParam().argv;
 
-    ASSERT_THROW(parser.parseOpts(argc, argv), dep::InvalidConversion);
+    ASSERT_THROW(parser.parseOpts(argc, argv), minimum::InvalidConversion);
 }
 
 INSTANTIATE_TEST_SUITE_P(WillThrowException, OptParseTestWillThrowException, testing::Values( /* NOLINT */

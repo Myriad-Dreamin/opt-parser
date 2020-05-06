@@ -482,9 +482,3 @@ namespace minimum {
     }
 }
 
-namespace dep {
-    using namespace minimum;
-}
-
-
-
